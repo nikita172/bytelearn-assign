@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/bytelearn/static/css/main.490222ec.css",
-    "main.js": "/bytelearn/static/js/main.fe1b880a.js",
-    "index.html": "/bytelearn/index.html",
-    "static/media/arrow-down.svg": "/bytelearn/static/media/arrow-down.c3baa553119d3886ef98c01cdd147919.svg",
-    "main.490222ec.css.map": "/bytelearn/static/css/main.490222ec.css.map",
-    "main.fe1b880a.js.map": "/bytelearn/static/js/main.fe1b880a.js.map"
+    "main.css": "/bytelearn-assign/static/css/main.490222ec.css",
+    "main.js": "/bytelearn-assign/static/js/main.48eabff0.js",
+    "index.html": "/bytelearn-assign/index.html",
+    "static/media/arrow-down.svg": "/bytelearn-assign/static/media/arrow-down.c3baa553119d3886ef98c01cdd147919.svg",
+    "main.490222ec.css.map": "/bytelearn-assign/static/css/main.490222ec.css.map",
+    "main.48eabff0.js.map": "/bytelearn-assign/static/js/main.48eabff0.js.map"
   },
   "entrypoints": [
     "static/css/main.490222ec.css",
-    "static/js/main.fe1b880a.js"
+    "static/js/main.48eabff0.js"
   ]
 }
