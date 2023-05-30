@@ -25,6 +25,7 @@ const Home = () => {
     setElements(arr2);
   }, [result])
 
+  // to check whether the input array contain all numbers or not, so that we can enable check button
   function checkNumbers() {
     setElements((item) => {
       let check = item.every(element => typeof element === 'number');
@@ -34,6 +35,8 @@ const Home = () => {
   }
 
   const drop = (e) => {
+
+    //for interchange with in input array
     if (dragItem.current == null) {
       let value = (elements[dragItemElement.current]);
       const _elements = [...elements];
@@ -45,7 +48,7 @@ const Home = () => {
       setDragHover(null);
       return;
     }
-
+    // putting elements from options array into input array
     let value = data[dragItem.current];
     const _data = [...data];
     const allItems = _data.filter((item, index) => index !== dragItem.current);
@@ -59,7 +62,7 @@ const Home = () => {
     setIsDragStart(!isDragStart)
     setDragHover(null);
   }
-
+  // push elements from input array into options array
   const onOptionsDrop = () => {
     console.log(elements[dragOverItem.current])
     const _elements = [...elements];
@@ -72,6 +75,7 @@ const Home = () => {
     setDragHover(null);
   }
 
+  // to check whether array is sorted or not
   const checkSort = () => {
     function sorted(arr) {
       let second_index;
