@@ -19,25 +19,28 @@ const Home = () => {
     dragging.current = value;
     swap.current = isSwap
   }
-
   const onDrop = (e, destination) => {
     if (dragging.current !== null && destination !== undefined) {
       // if swap.current = true then dragging.current = index
       if (typeof destination === "number") {
         if (swap.current) {
+          console.log(dragging.current)
           setInputState(old => ({
             ...old,
             [destination]: old[dragging.current],
             [dragging.current]: old[destination]
           }))
         } else {
+          console.log("this runs")
           setInputState(old => ({
             ...old,
             [destination]: dragging.current
           }))
         }
       } else {
+
         setInputState(old => ({
+
           ...old,
           [dragging.current]: undefined
         }))
@@ -93,7 +96,6 @@ const Home = () => {
             <div className="dropContainer">
               {options.map((item, index) => (
                 <div key={index}
-                  // id={index ? "setOpacity" : ""}
                   draggable={inputState[index] !== undefined}
                   onDragStart={e => onDragStart(e, index, true)}
                   onDrop={e => onDrop(e, index)}
