@@ -1,116 +1,83 @@
 import React, { useState, useEffect, useRef } from 'react'
 import DownArrow from "../icons/arrow-down.svg"
 import "./home.css"
+
+const randomNumbers = () => {
+  return Array.from({ length: 5 }).map(e => 10 + Math.ceil(Math.random() * 100))
+}
+
 const Home = () => {
-  const [dragHover, setDragHover] = useState(null);
-  const [isAllNumbers, setIsAllNumbers] = useState(false);
+  const [options, setOptions] = useState(randomNumbers);
+  const [inputState, setInputState] = useState({});
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState(false);
-  const [data, setData] = useState([]); // options array
-  const [elements, setElements] = useState([]); // input array
-  const [isDragStart, setIsDragStart] = useState(false);
-  const dragItem = useRef();
-  const dragOverItem = useRef();
-  const dragItemElement = useRef();
+  const dragging = useRef(null);
+  const swap = useRef(false)
 
-  const arr = [];
-  const arr2 = ["Drop", "Drop", "Drop", "Drop", "Drop",];
 
-  for (let i = 0; i < 5; i++) {
-    arr.push(Math.floor(Math.random() * 100) + 1);
+  const onDragStart = (e, value, isSwap) => {
+    dragging.current = value;
+    swap.current = isSwap
   }
 
-  useEffect(() => {
-    setData(arr);
-    setElements(arr2);
-  }, [result])
-
-  // to check whether the input array contain all numbers or not, so that we can enable check button
-  function checkNumbers() {
-    setElements((item) => {
-      let check = item.every(element => typeof element === 'number');
-      setIsAllNumbers(check);
-      return item;
-    })
-  }
-
-  const drop = (e) => {
-
-    //for interchange with in input array
-    if (dragItem.current == null) {
-      let value = (elements[dragItemElement.current]);
-      const _elements = [...elements];
-      _elements[dragOverItem.current] = value;
-      _elements.splice(dragItemElement.current, 1, "Drop")
-      setElements(_elements);
-      dragItemElement.current = null;
-      setIsDragStart(!isDragStart)
-      setDragHover(null);
-      return;
-    }
-    // putting elements from options array into input array
-    let value = data[dragItem.current];
-    const _data = [...data];
-    const allItems = _data.filter((item, index) => index !== dragItem.current);
-    setData(allItems);
-    const _elements = [...elements];
-    _elements[dragOverItem.current] = value;
-    setElements(_elements);
-    checkNumbers();
-    dragItem.current = null;
-    dragOverItem.current = null;
-    setIsDragStart(!isDragStart)
-    setDragHover(null);
-  }
-  // push elements from input array into options array
-  const onOptionsDrop = () => {
-    console.log(elements[dragOverItem.current])
-    const _elements = [...elements];
-    const val = _elements[dragOverItem.current]
-    _elements[dragOverItem.current] = "Drop";
-    setElements(_elements);
-    setData((items) => [...items, val])
-    dragOverItem.current = null;
-    checkNumbers();
-    setDragHover(null);
-  }
-
-  // to check whether array is sorted or not
-  const checkSort = () => {
-    function sorted(arr) {
-      let second_index;
-      for (let first_index = 0; first_index < arr.length; first_index++) {
-        second_index = first_index + 1;
-        if (arr[second_index] - arr[first_index] < 0) return false;
+  const onDrop = (e, destination) => {
+    if (dragging.current !== null && destination !== undefined) {
+      // if swap.current = true then dragging.current = index
+      if (typeof destination === "number") {
+        if (swap.current) {
+          setInputState(old => ({
+            ...old,
+            [destination]: old[dragging.current],
+            [dragging.current]: old[destination]
+          }))
+        } else {
+          setInputState(old => ({
+            ...old,
+            [destination]: dragging.current
+          }))
+        }
+      } else {
+        setInputState(old => ({
+          ...old,
+          [dragging.current]: undefined
+        }))
       }
-      return true;
     }
-    let val = sorted(elements);
-    setResult(val);
-    setShowResult(true);
   }
 
-  const resetBtn = () => {
-    setResult(!result);
+  const handleOnReset = () => {
+    setInputState({});
+    setOptions(randomNumbers);
     setShowResult(false);
-    setIsAllNumbers(false);
+    setResult(false);
   }
 
-  const dragEnd = () => {
-    dragItem.current = null;
-    setIsDragStart(!isDragStart)
-  }
-  const checkHover = () => {
-    setDragHover(dragOverItem.current)
-  }
-  const dragLeave = () => {
-    setDragHover(null)
-  }
-  const allowDrop = (e) => {
-    e.preventDefault();
-    setDragHover(dragOverItem.current)
+  const checkResult = () => {
+    const answer = options.map((v, i) => inputState[i])
+    let sorted = true;
+    for (let i = 0; i < answer.length - 1; i++) {
+      if (answer[i] > answer[i + 1]) {
+        sorted = false;
+        break;
+      }
+    }
+
+    setShowResult(true);
+    setResult(sorted);
   }
 
+  const onDragEnd = () => {
+    dragging.current = null;
+    swap.current = false;
+  }
+
+  const onDragOver = (e) => {
+    e.preventDefault()
+  }
+
+  const inputStateArr = Object.values(inputState)
+
+  const enableCheckBtn = !options.map((v, i) => inputState[i]).includes(undefined);
 
   return (
     <div className='homeContainer'>
@@ -119,45 +86,39 @@ const Home = () => {
         showResult ?
           <div className='resultContainer'>
             <div className='resultHeading'>{result ? <>Correct Answer <img className='tick' src="https://static.vecteezy.com/system/resources/previews/017/177/933/original/round-check-mark-symbol-with-transparent-background-free-png.png" ></img></> : <>Wrong Answer <div className='cross'>X</div></>}</div>
-            <button onClick={resetBtn} className={result ? "correctBtn" : "resetBtn"}>RESET</button>
+            <button onClick={handleOnReset} className={result ? "correctBtn" : "resetBtn"}>RESET</button>
           </div>
           :
           <>
             <div className="dropContainer">
-              {elements.map((item, index) => (
+              {options.map((item, index) => (
                 <div key={index}
-                  id={index == dragHover ? "setOpacity" : ""}
-                  className={typeof (item) == "number" ? "hideBorder" : "value"}
-                  onDragOver={allowDrop}
-                  onDragStart={e => dragItemElement.current = index}
-                  onDragLeave={dragLeave}
-                  draggable={typeof (item) == "number" ? "true" : "false"}
-                  onDragEnter={e => {
-                    dragOverItem.current = index
-                    checkHover();
-                  }}
-                  onDrop={drop}
+                  // id={index ? "setOpacity" : ""}
+                  draggable={inputState[index] !== undefined}
+                  onDragStart={e => onDragStart(e, index, true)}
+                  onDrop={e => onDrop(e, index)}
+                  onDragOver={onDragOver}
+                  className={inputState[index] ? "hideBorder" : "value"}
                 >
-                  <div className={typeof (item) == "number" ? "fiveDot" : "hideFiveDot"}>
+                  <div className={inputState[index] ? "fiveDot" : "hideFiveDot"}>
                     <div className='dot'></div>
                     <div className='dot'></div>
                     <div className='dot'></div>
                     <div className='dot'></div>
                     <div className='dot'></div>
                   </div>
-                  <img className={typeof (item) == "number" ? "disableArrow" : "downArrowIcon"} src={DownArrow} />
-                  <>{item}</>
+                  <img className={inputState[index] ? "disableArrow" : "downArrowIcon"} src={DownArrow} />
+                  <>{inputState[index] || "Drop"}</>
                 </div>
               ))}
             </div>
-            <div className="values" onDrop={onOptionsDrop}>
-              {data?.map((item, index) => (
+            <div className="values" onDrop={e => onDrop(e, "bucket")} onDragOver={onDragOver}>
+              {options.filter(item => !inputStateArr.includes(item)).map((item, index) => (
                 <div key={index}
-                  className={index == dragItem.current ? "dragStarting" : "options"}
+                  className={index === -1 ? "dragStarting" : "options"}
                   draggable
-                  onDragOver={allowDrop}
-                  onDragStart={(e) => dragItem.current = index}
-                  onDragEnd={dragEnd}
+                  onDragEnd={onDragEnd}
+                  onDragStart={e => onDragStart(e, item)}
                 >
                   <div className='fiveDot'>
                     <div className='dot'></div>
@@ -170,7 +131,7 @@ const Home = () => {
                 </div>
               ))}
             </div>
-            <button className="button" onClick={checkSort} disabled={isAllNumbers ? false : true}>Check Answer</button>
+            <button className="button" onClick={checkResult} disabled={enableCheckBtn ? false : true}>Check Answer</button>
           </>
       }
     </div >
