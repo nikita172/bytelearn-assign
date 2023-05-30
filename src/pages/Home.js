@@ -6,8 +6,8 @@ const Home = () => {
   const [isAllNumbers, setIsAllNumbers] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState(false);
-  const [data, setData] = useState([]);
-  const [elements, setElements] = useState([]);
+  const [data, setData] = useState([]); // options array
+  const [elements, setElements] = useState([]); // input array
   const [isDragStart, setIsDragStart] = useState(false);
   const dragItem = useRef();
   const dragOverItem = useRef();
